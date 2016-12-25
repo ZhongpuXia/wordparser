@@ -1,0 +1,1 @@
+word paser for file
