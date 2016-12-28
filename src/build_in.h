@@ -6,11 +6,13 @@
 
 namespace parser {
 
-int parse(std::string str, int& value);
+void parse(std::string str, int& value);
 
-int parse(std::string str, float& value);
+void parse(std::string str, float& value);
 
-int parse(std::string str, const char* value);
+void parse(std::string str, float& value);
+
+void parse(std::string str, const char* value);
 
 } // end of parser
 #endif
