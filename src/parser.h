@@ -1,21 +1,22 @@
-#include <string>
+#ifndef _PARSER_H_
+#define _PARSER_H_
 
-#ifndef __PARSER_H__
-#define __PARSER_H__
+#include <string>
+#include <vector>
+
+#include "build_in.h"
+#include "user.h"
 
 namespace parser {
 class Parser {
 public:
-	Parser();
+	explicit void Parser(std::string columns_type);
 	parse_line();
 
 private:
-	parse(char* str, int& value);
-	parse(char* str, float& value);
-	parse(char* str, std::String& value);
+    std::vector<std::string> _types;
 
-
-};// end of class
-} // end of namespace
+};
+} // end of parser
 
 #endif

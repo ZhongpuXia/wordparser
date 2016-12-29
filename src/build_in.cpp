@@ -54,7 +54,8 @@ void parse(std::string str, double& value) {
 }
 
 void parse(std::string str, const char* value) {
-    value = str.c_str();
+    value = str.data();
+    std::cout << "function: " << value << std::endl;
 
     return;
 }
