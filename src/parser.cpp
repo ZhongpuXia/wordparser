@@ -13,6 +13,7 @@ void Parser::Parser(const std::string& column_types, std::string delimiter{
 	_types = split(column_types, delimiter);
 }
 
+
 void Parser::parse_line(const std::string& str) {
     std::vector<std::string> contents = split(str, _delimiter);
 }
@@ -55,6 +56,25 @@ std::vector<T> parse(std::string str) {
 	return values;
 }
 
+=======
+}
+
+
+std::vector<std::string> Parser::split(const std::string str, const std::string delimiter) {
+	std::size_t pos = 0;
+	std::size_t found = 0;
+	std::vector<std::string> str_vector;
+	while (pos != std::string::npos) {
+	    found = str.find_first_of(delimiter);
+		str_vector.emplace_back(str.substr(pos, found - pos));
+		pos = found;
+	}
+
+	return str_vector;
+}
+
+template<class T>
+>>>>>>> 80de5eaf475fe3d21e3ca9dcc92e6f7f654ced33
 T get_type(std::size_t index) {
 	type_str = _types[index];
 	switch(type_str) {
