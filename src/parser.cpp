@@ -1,23 +1,69 @@
 #include "parser.h"
 
+#include <memory>
 
 namespace parser {
 
-void Parser::Parser(const std::string& column_types) {
+void Parser::Parser(const std::string& formats) {
 	_delimiter = '\t';
-	_types = split(column_types, _delimiter);
+	_formats = split(formats, _delimiter);
+	_size_columns = _formats.size();
 }
 
-void Parser::Parser(const std::string& column_types, std::string delimiter{
+void Parser::Parser(const std::string& formats, std::string delimiter) {
 	_delimiter = delimiter;
-	_types = split(column_types, delimiter);
+	_formats = split(formats, delimiter);
+	_size_columns = _formats.size();
 }
 
+void set_format(const std::string& formats) {
+	_formats = split(formats, _delimiter);
+}
 
 void Parser::parse_line(const std::string& str) {
     std::vector<std::string> contents = split(str, _delimiter);
+	if (contents.size() != _size_columns) {
+		std::cout << "[Error] the size  is different from";
+		return;
+	}
+	for (int i = 0; i < _size_columns; ++i) {
+		std::string fmt = _formats[i];
+		switch(fmt) {
+			case "int": {
+				std::unique_ptr<int> value(new int);
+				parse(contents[i], value);
+				break;
+			}
+			case "float": {
+				std::unique_ptr<float> value(new float);
+				parse(contents[i], value)
+				break;
+			}
+			case "double": {
+				std::unique_ptr<double> value(new double);
+				parse(contents[i], value);
+				break;
+			}
+			case "char": {
+				std::unique_ptr<char> value(new char);
+				parse(contents[i], value);
+				break;
+			}
+			case "User": {
+				std::unique_ptr<User> value(new User);
+				parse(contents[i], value);
+				break;
+			}
+			default: {
+			    std::cout << "undefined type: [" << type_str <<"], the type is string at default" << std::endl;
+			    std::string result;
+			    return result;
+			}
+		}
+		std::shared_ptr<void> v = std::dynamic_pointer_cast<void>(value);
+		_values.push_back(v);
+	}
 }
-
 
 std::vector<std::string> Parser::split(const std::string str, const std::string delimiter) {
 	std::size_t pos = 0;
@@ -56,52 +102,4 @@ std::vector<T> parse(std::string str) {
 	return values;
 }
 
-=======
-}
-
-
-std::vector<std::string> Parser::split(const std::string str, const std::string delimiter) {
-	std::size_t pos = 0;
-	std::size_t found = 0;
-	std::vector<std::string> str_vector;
-	while (pos != std::string::npos) {
-	    found = str.find_first_of(delimiter);
-		str_vector.emplace_back(str.substr(pos, found - pos));
-		pos = found;
-	}
-
-	return str_vector;
-}
-
-template<class T>
->>>>>>> 80de5eaf475fe3d21e3ca9dcc92e6f7f654ced33
-T get_type(std::size_t index) {
-	type_str = _types[index];
-	switch(type_str) {
-		case "int": {
-			int result = 0;
-			return result;
-		}
-		case "float": {
-			float result = 0.0;
-			return result;
-		}
-		case "double": {
-			double result = 0.0;
-			return result;
-		}
-		case "char*": {
-			char* result = '\0';
-			return result;
-		}
-		case "User": {
-			User result;
-			return result;
-		}
-		default: {
-			std::cout << "undefined type: [" << type_str <<"], the type is string at default" << std::endl;
-			std::string result;
-			return result;
-		}
-}
 } //end of parser
