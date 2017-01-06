@@ -16,42 +16,43 @@ void Parser::Parser(const std::string& formats, std::string delimiter) {
 	_size_columns = _formats.size();
 }
 
-void set_format(const std::string& formats) {
+void Parser::set_format(const std::string& formats) {
 	_formats = split(formats, _delimiter);
 }
 
-void Parser::parse_line(const std::string& str) {
-    std::vector<std::string> contents = split(str, _delimiter);
-	if (contents.size() != _size_columns) {
+void Parser::parse_line(const std::string& line) {
+    std::vector<std::string> words = split(line, _delimiter);
+	if (words.size() != _size_columns) {
 		std::cout << "[Error] the size  is different from";
 		return;
 	}
 	for (int i = 0; i < _size_columns; ++i) {
 		std::string fmt = _formats[i];
+        std::size_t sz;
 		switch(fmt) {
 			case "int": {
-				std::unique_ptr<int> value(new int);
-				parse(contents[i], value);
+				int* value_ptr = nullptr;
+				parse_word(words[i], value_ptr, sz);
 				break;
 			}
 			case "float": {
-				std::unique_ptr<float> value(new float);
-				parse(contents[i], value)
+                float* value_ptr = nullptr;
+                parse_word(words[i], value_ptr, sz);
 				break;
 			}
 			case "double": {
-				std::unique_ptr<double> value(new double);
-				parse(contents[i], value);
+                double* value_ptr = nullptr;
+                parse_word(words[i], value_ptr, sz);
 				break;
 			}
 			case "char": {
-				std::unique_ptr<char> value(new char);
-				parse(contents[i], value);
-				break;
+                char* value_ptr = nullptr;
+                parse_word(words[i], value_ptr, sz);
+                break;
 			}
 			case "User": {
-				std::unique_ptr<User> value(new User);
-				parse(contents[i], value);
+                User* value_ptr = nullptr;
+				parse_word(words[i], value_ptr, sz);
 				break;
 			}
 			default: {
@@ -59,10 +60,36 @@ void Parser::parse_line(const std::string& str) {
 			    std::string result;
 			    return result;
 			}
-		}
-		std::shared_ptr<void> v = std::dynamic_pointer_cast<void>(value);
-		_values.push_back(v);
+        }
+        std::unique_ptr<void> vp((void*)value_ptr);
+		_values.push_back(vp);
+        _values_size.push_back(sz);
 	}
+}
+
+
+template<class T>
+void parse_word(std::string word, T* values, std::size_t& size) {
+	std::vector<std::string> word_vector = split(word, ':');
+
+	if (word_vector.size() < 2) {
+        size = 1;
+        T value;
+		parse(word, value);
+        values = new T(value);
+	}
+    else {
+	    parse(word_vector[0], (int)size);
+        values = new T[size];
+	    std::vector<T> subwords = split(word_vector[1], ' ');
+        if (subwords.size() != size) {
+            print("[WARN]: ******!")
+        }
+        for (std::size_t i = 0; i < size; ++i) {
+            parse(subwords[i], values[i]);
+        }
+    }
+	return;
 }
 
 std::vector<std::string> Parser::split(const std::string str, const std::string delimiter) {
@@ -76,30 +103,6 @@ std::vector<std::string> Parser::split(const std::string str, const std::string 
 	}
 
 	return str_vector;
-}
-
-template<class T>
-std::vector<T> parse(std::string str) {
-	std::vector<std::string> str_vector = split(str, ':');
-	T value;
-	std::vector<T> values;
-	if (str_vector.size() < 2) {
-		parse(str, value);
-		values.emplace_back(value);
-		return values;
-	}
-	int num = 0;
-	parse(str_vector[0], num);
-	std::vector<T> str_contents = split(str_vector[1], ' ');
-	for ( auto it = str_contents.begin(), it != str_contents.end(), ++it) {
-		parse(*it, value);
-		values.emplace_back(value);
-	}
-	if (values.size() != num) {
-		print("[WARN]: ******!")
-	}
-
-	return values;
 }
 
 } //end of parser

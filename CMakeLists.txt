@@ -14,6 +14,9 @@ add_executable(tabular_parser ${SRC_LIST})
 
 
 #--------- test ----------------
+enable_testing()
+add_subdirectory(test)
+
 #add_test()
 
 

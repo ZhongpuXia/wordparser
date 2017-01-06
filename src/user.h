@@ -9,9 +9,12 @@ namespace parser {
 struct User {
     int id;
     const char* name;
+    friend std::ostream& operator<< (std::ostream& os, const User& user);
 };
 
 void parse(std::string str, User& user);
+
+
 
 } // end of parser
 

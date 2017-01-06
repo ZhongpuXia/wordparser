@@ -13,11 +13,13 @@ public:
 	explicit void Parser(const std::string& formats);
 	explicit void Parser(const std::string& format, std::string delimiter);
 	void set_format(const std::string& formats)
-	parse_line();
+	void parse_line(const std::string& line);
+    void parse_word(const std::string& word);
 
 private:
     std::vector<std::string> _formats;
 	std::vector<std::unique_ptr<void>> _values;
+    std::vector<std::size_t> _values_size;
 	std::string _delimiter;
 	std::size_t _size_columns;
 

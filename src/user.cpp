@@ -2,6 +2,12 @@
 
 namespace parser {
 
+std::ostream& operator<< (std::ostream& os, const User& user) {
+    os << "id: " << user.id;
+    os << "name: " << user.name;
+    return os;
+}
+
 void parse(std::string str, User& user) {
     std::size_t len = str.length();
     if (0 == len) {
