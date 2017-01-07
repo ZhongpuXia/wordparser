@@ -4,7 +4,7 @@ add_compile_options(-std=c++11)
 
 #--------- compile -------------
 include_directories("${PROJECT_SOURCE_DIR}/src")
-set(SRC_LIST src/main.cpp  src/build_in.cpp)
+set(SRC_LIST src/main.cpp  src/build_in.cpp src/user.cpp)
 add_executable(tabular_parser ${SRC_LIST})
 
 
@@ -14,8 +14,8 @@ add_executable(tabular_parser ${SRC_LIST})
 
 
 #--------- test ----------------
-enable_testing()
-add_subdirectory(test)
+#enable_testing()
+#add_subdirectory(test)
 
 #add_test()
 

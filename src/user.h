@@ -2,19 +2,20 @@
 #define _USER_H_
 
 #include <string>
+#include <memory>
 #include <iostream>
 
 namespace parser {
 
 struct User {
     int id;
-    const char* name;
-    friend std::ostream& operator<< (std::ostream& os, const User& user);
+	std::string name;
+	int age;
+
+    friend std::ostream& operator<< (std::ostream& out, const User& user);
 };
 
-void parse(std::string str, User& user);
-
-
+void parse(const std::string str, User& user);
 
 } // end of parser
 

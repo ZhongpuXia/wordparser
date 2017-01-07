@@ -3,6 +3,7 @@
 #include <string>
 
 #include "build_in.h"
+#include "user.h"
 
 int user_inerface(int& row, int& column) {
 	std::cout << "Please enter the row:" << std::endl;
@@ -32,17 +33,22 @@ int main() {
 
 	int row = 0;
 	float column = 0;
-    const char* name;
-    std::string yy = "name1";
+	char* name;
+	parser::User user = {1, "Joe", 15};
     parser::parse("11", row);
     parser::parse("1.12", column);
-    parser::parse(yy, name);
-
     std::cout << "int:" << row << std::endl;
     std::cout << "float:" << column << std::endl;
+    
+	parser::parse("name", &name);
     std::cout << "char:" << name << std::endl;
 
-    name = yy.c_str();
-    std::cout << "char:" << name << std::endl;
+	std::cout << user << std::endl;
+	parser::parse("2 Lucy 15", user);
+	std::cout << "user: " << user << std::endl;
+
+	delete[] name;
+
+
     return 1;
 }

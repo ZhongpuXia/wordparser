@@ -53,11 +53,31 @@ void parse(std::string str, double& value) {
     return;
 }
 
-void parse(std::string str, const char* value) {
-    value = str.data();
-    std::cout << "function: " << value << std::endl;
+void parse(std::string str, char** value) {
+	std::size_t len = str.length();
+
+	char* temp = new char[len + 1];
+	std::copy(str.begin(), str.end(), temp);
+	temp[len] = '\0';
+	*value = temp;
 
     return;
+}
+
+void split(std::string str, std::string delimiter, std::vector<std::string>& sub_strs) {
+	std::size_t pos = 0;
+	std::size_t found = 0;
+	while (found != std::string::npos) {
+	    found = str.find_first_of(delimiter, pos);
+		if (found == pos) {
+			pos += 1;
+			continue;
+		}
+		sub_strs.emplace_back(str.substr(pos, found - pos));
+		pos = found + 1;
+	}
+
+	return;
 }
 
 } // end of parser
