@@ -7,16 +7,16 @@
 #include <memory>
 #include <ostream>
 
-#include "build_in.h"
+#include "utils.h"
 #include "user.h"
 
 namespace parser {
 class Parser {
 public:
-	explicit Parser(const std::string& formats);
-	explicit Parser(const std::string& format, std::string delimiter);
-	void set_format(const std::string& formats);
-	void parse_line(const std::string& line);
+	explicit Parser(std::string formats);
+	explicit Parser(std::string formats, std::string delimiter);
+	void set_format(std::string formats);
+	void parse_line(std::string line);
 
 	//template<typename T>
     //void parse_word(std::string word, std::shared_ptr<void>& value_ptr, int& value_size);
@@ -25,7 +25,7 @@ public:
 	template<typename T>
 	void parse_word(std::string word, std::shared_ptr<void>& value_ptr, int& value_size) {
 		std::vector<std::string> word_vector;
-		split(word, ":", word_vector);
+		utils::split(word, ":", word_vector);
 		std::vector<std::string> subwords;
 
 		if (word_vector.size() < 2) {
@@ -33,8 +33,8 @@ public:
 			subwords = word_vector;
 		}
 		else {
-			parse(word_vector[0], value_size);
-			split(word_vector[1], " ", subwords);
+			utils::parse(word_vector[0], value_size);
+			utils::split(word_vector[1], " ", subwords);
 		}
 		T* pv = new T[value_size];
 		if (static_cast<int>(subwords.size()) != value_size) {
@@ -43,7 +43,7 @@ public:
 		for (int i = 0; i < value_size; ++i) {
 			T v;
 			std::cout << i << "-subwords:" << subwords[i] << std::endl;
-			parse(subwords[i], v);
+			utils::parse(subwords[i], v);
 			pv[i] = v;
 		}
 		value_ptr = std::shared_ptr<void>(pv);

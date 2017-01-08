@@ -5,7 +5,7 @@
 #include <memory>
 #include <iostream>
 
-namespace parser {
+namespace utils {
 
 struct User {
     int id;
@@ -15,8 +15,8 @@ struct User {
     friend std::ostream& operator<< (std::ostream& out, const User& user);
 };
 
-void parse(const std::string str, User& user);
+void parse(std::string str, User& user);
 
-} // end of parser
+} // end of utils
 
 #endif

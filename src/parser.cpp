@@ -1,3 +1,4 @@
+#include <glog/logging.h>
 #include "parser.h"
 
 namespace parser {
@@ -10,38 +11,35 @@ void Parser::init_map() {
 	_format_map["User"] = 4;
 }
 
-Parser::Parser(const std::string& formats) {
+Parser::Parser(std::string formats) {
 	_delimiter = "\t";
-	_formats.clear();
-	split(formats, _delimiter, _formats);
+	utils::split(formats, _delimiter, _formats);
 	_columns_size = _formats.size();
 	init_map();
 }
 
-Parser::Parser(const std::string& formats, std::string delimiter) {
+Parser::Parser(std::string formats, std::string delimiter) {
 	_delimiter = delimiter;
-	_formats.clear();
-	split(formats, delimiter, _formats);
+	utils::split(formats, delimiter, _formats);
 	_columns_size = _formats.size();
 	init_map();
 }
 
-void Parser::set_format(const std::string& formats) {
-	_formats.clear();
-	split(formats, _delimiter, _formats);
+void Parser::set_format(std::string formats) {
+	utils::split(formats, _delimiter, _formats);
+	_columns_size = _formats.size();
 }
 
-void Parser::parse_line(const std::string& line) {
+void Parser::parse_line(std::string line) {
     std::vector<std::string> words;
-	split(line, _delimiter, words);
+	utils::split(line, _delimiter, words);
 	if (static_cast<int>(words.size()) != _columns_size) {
-		std::cout << "[Error] the size  is different from";
+		LOG(ERROR) << "Wrong size of the lines!";
 		return;
 	}
 	for (int i = 0; i < _columns_size; ++i) {
 		int value_size = 0;
 		std::shared_ptr<void> value_ptr(nullptr);
-		std::cout << i << ":" << words[i] << std::endl;
 		
 		switch (_format_map[_formats[i]]) {
 			std::cout << _format_map[_formats[i]] << std::endl;
@@ -59,12 +57,13 @@ void Parser::parse_line(const std::string& line) {
                 parse_word<char*>(words[i], value_ptr, value_size);
                 break;
 			case 4: 
-				parse_word<User>(words[i], value_ptr, value_size);
+				parse_word<utils::User>(words[i], value_ptr, value_size);
 				break;
 			default: 
-			    std::cout << "undefined type: [" << _formats[i] <<"], the type is string at default" << std::endl;
+				LOG(WARNING) << "undefined type: [" << _formats[i] <<"]";
         }
 
+		LOG(INFO) << "The " << i << "-th row is: " << _formats[i] << ", size = " << value_size;
 		_values.emplace_back(value_ptr);
         _values_size.push_back(value_size);
 	}

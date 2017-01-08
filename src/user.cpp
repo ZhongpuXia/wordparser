@@ -1,7 +1,8 @@
+#include <glog/logging.h>
 #include "user.h"
-#include "build_in.h"
+#include "utils.h"
 
-namespace parser {
+namespace utils {
 
 std::ostream& operator<< (std::ostream& out, const User& user) {
     out << " id=" << user.id;
@@ -10,24 +11,31 @@ std::ostream& operator<< (std::ostream& out, const User& user) {
     return out;
 }
 
-void parse(const std::string str, User& user) {
+void parse(std::string str, User& user) {
     std::size_t len = str.length();
     if (0 == len) {
-        std::cout << "[WARN] the input string is empty!" << std::endl;
+		LOG(WARNING) << "The string is empty, default value is set!";
+		user.id = 0;
+		user.name = "";
+		user.age = 0;
         return;
     }
+
 	std::vector<std::string> sub_strs;
 	split(str, " ", sub_strs);
-
 	if (3 != sub_strs.size()) {
-		std::cout << "[WARN] the input string is wrong!";
+		LOG(WARNING) << "Size of string is wrong, default value is set!";
+		user.id = 0;
+		user.name = "";
+		user.age = 0;
+        return;
 	}
-	std::cout << sub_strs[0] << sub_strs[1] << sub_strs[2] << std::endl;
 	parse(sub_strs[0], user.id);
 	user.name = sub_strs[1];
 	parse(sub_strs[2], user.age);
+	LOG(INFO) << "Parse User:" << user;
     
 	return;
 }
 
-} // end of parser
+} // end of utils

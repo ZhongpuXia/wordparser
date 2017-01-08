@@ -3,7 +3,7 @@
 #include <string>
 #include <glog/logging.h>
 
-#include "build_in.h"
+#include "utils.h"
 #include "user.h"
 #include "parser.h"
 
@@ -44,22 +44,21 @@ int main(int argc, char** argv) {
 	int row = 0;
 	float column = 0;
 	char* name;
-	parser::User user = {1, "Joe", 15};
-    parser::parse("11", row);
-    parser::parse("1.12", column);
+	utils::User user = {1, "Joe", 15};
+    utils::parse("11", row);
+    utils::parse("1.12", column);
     std::cout << "int:" << row << std::endl;
     std::cout << "float:" << column << std::endl;
     
-	parser::parse("name", name);
+	utils::parse("name", name);
     std::cout << "char:" << name << std::endl;
 
 	std::cout << user << std::endl;
-	parser::parse("2 Lucy 15", user);
+	utils::parse("2 Lucy 15", user);
 	std::cout << "user: " << user << std::endl;
 
 	delete[] name;
 
-	std::cout << "chu:" << parser::chu<double>() << std::endl;
 	
 	parser::Parser tab("int\tchar\tfloat", "\t");
 	tab.parse_line("5\tname\t3.14");
