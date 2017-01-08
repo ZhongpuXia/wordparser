@@ -42,7 +42,6 @@ public:
 		}
 		for (int i = 0; i < value_size; ++i) {
 			T v;
-			std::cout << i << "-subwords:" << subwords[i] << std::endl;
 			utils::parse(subwords[i], v);
 			pv[i] = v;
 		}
