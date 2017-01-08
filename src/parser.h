@@ -18,24 +18,61 @@ public:
 	void set_format(const std::string& formats);
 	void parse_line(const std::string& line);
 
-	template<class T>
-    void parse_word(const std::string& word, T* values, std::size_t& size);
+	//template<typename T>
+    //void parse_word(std::string word, std::shared_ptr<void>& value_ptr, int& value_size);
 
-	friend std::ostream& operator<<(std::ostream& out, const Parser parser);
+
+	template<typename T>
+	void parse_word(std::string word, std::shared_ptr<void>& value_ptr, int& value_size) {
+		std::vector<std::string> word_vector;
+		split(word, ":", word_vector);
+		std::vector<std::string> subwords;
+
+		if (word_vector.size() < 2) {
+			value_size = 1;
+			subwords = word_vector;
+		}
+		else {
+			parse(word_vector[0], value_size);
+			split(word_vector[1], " ", subwords);
+		}
+		T* pv = new T[value_size];
+		if (static_cast<int>(subwords.size()) != value_size) {
+			std::cout << "[WARN]: ******!";
+		}
+		for (int i = 0; i < value_size; ++i) {
+			T v;
+			std::cout << i << "-subwords:" << subwords[i] << std::endl;
+			parse(subwords[i], v);
+			pv[i] = v;
+		}
+		value_ptr = std::shared_ptr<void>(pv);
+
+		return;
+	}
+
+	template<typename T>
+	T* get_value(int row, int& size) {
+		size = _values_size[row];
+		T* value_ptr = static_cast<T*>(_values[row].get());
+		return value_ptr;
+	}
+
+	//friend std::ostream& operator<<(std::ostream& out, const Parser parser);
 
 private:
     std::vector<std::string> _formats;
 	std::vector<std::shared_ptr<void> > _values;
-    std::vector<std::size_t> _values_size;
+    std::vector<int> _values_size;
 	std::string _delimiter;
-	std::size_t _columns_size;
+	int _columns_size;
 
 	std::map<std::string, int> _format_map;
 	void init_map();
 
-	std::vector<std::string> split(const std::string str, const std::string delimiter);
-
 };
+
+
 } // end of parser
 
 #endif

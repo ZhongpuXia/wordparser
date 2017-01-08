@@ -53,13 +53,12 @@ void parse(std::string str, double& value) {
     return;
 }
 
-void parse(std::string str, char** value) {
+void parse(std::string str, char*& value) {
 	std::size_t len = str.length();
 
-	char* temp = new char[len + 1];
-	std::copy(str.begin(), str.end(), temp);
-	temp[len] = '\0';
-	*value = temp;
+	value = new char[len + 1];
+	std::copy(str.begin(), str.end(), value);
+	value[len] = '\0';
 
     return;
 }
