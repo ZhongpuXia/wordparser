@@ -59,12 +59,12 @@ int main(int argc, char** argv) {
     delete[] p_d;
     //delete p_user;
 
-    /*
-	parser::Parser tab("int\tchar\tfloat", "\t");
-	tab.parse_line("5\tname\t3.14");
-	std::cout << tab.get_value<int>(0, 0) << std::endl;
-	std::cout << tab.get_value<char>(1, 0) << std::endl;
-	std::cout << tab.get_value<float>(2, 0) << std::endl;*/
+	parser::Parser ps("\t");
+    ps.set_format("int\tchar\tfloat");
+	ps.parse_line("5\tname\t3.14");
+	std::cout << *ps.get_value<int>(0, 0) << std::endl;
+	std::cout << ps.get_value<char>(1, 0) << std::endl;
+	std::cout << *ps.get_value<float>(2, 0) << std::endl;
 
 	google::ShutdownGoogleLogging();
     return 0;

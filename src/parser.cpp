@@ -2,19 +2,17 @@
 
 namespace parser {
 
-Parser::Parser(std::string formats) {
-	_delimiter = "\t";
-    set_format(formats);
+Parser::Parser() {
+    _delimiter = "\t";
 }
 
-Parser::Parser(std::string formats, std::string delimiter) {
+Parser::Parser(std::string delimiter) {
 	_delimiter = delimiter;
-    set_format(formats);
 }
 
 bool Parser::set_format(std::string formats) {
     std::vector<std::string> fmts = utils::split(formats, _delimiter);
-	_columns_size = static_cast<int>(_formats.size());
+	_columns_size = static_cast<int>(fmts.size());
     _formats.resize(_columns_size);
     for (int i = 0; i < _columns_size; ++i) {
         if (fmts[i].compare("char") == 0) {
@@ -37,6 +35,7 @@ bool Parser::set_format(std::string formats) {
             return false;
         }
     }
+    LOG(INFO) << "size of formats: " << _columns_size;
     return true;
 }
 
@@ -46,31 +45,31 @@ bool Parser::parse_line(std::string line) {
 		LOG(ERROR) << "Wrong size of the lines!";
 		return false;
 	}
-	for (int i = 0; i < static_cast<int>(words.size()); ++i) {
-        enum Format fmt = _formats[i];
+	for (int row = 0; row < static_cast<int>(words.size()); ++row) {
+        enum Format fmt = _formats[row];
         std::vector<std::unique_ptr<void> > values_ptr;
+        _values.resize(words.size());
 		switch (fmt) {
             case CHAR:
-                values_ptr = parse_word<char>(words[i]);
+                parse_word<char>(words[row], row);
                 break;
 			case INT:
-                values_ptr = parse_word<int>(words[i]);
+                parse_word<int>(words[row], row);
                 break;
 			case FLOAT:
-                values_ptr = parse_word<float>(words[i]);
+                parse_word<float>(words[row], row);
                 break;
 			case DOUBLE:
-                values_ptr = parse_word<double>(words[i]);
+                parse_word<double>(words[row], row);
                 break;
 			case USER:
-                values_ptr = parse_word<utils::User>(words[i]);
+                parse_word<utils::User>(words[row], row);
                 break;
 			default:
 				LOG(ERROR) << "undefined type: [" << fmt <<"]";
                 return false;
         }
-		LOG(INFO) << "The " << i << "-th row is: " << _formats[i];
-		_values.emplace_back(std::move(values_ptr));
+		LOG(INFO) << "The " << row << "-th columns is: " << words[row];
 	}
     return true;
 }
