@@ -3,8 +3,6 @@
 #include <string>
 #include <glog/logging.h>
 
-#include "utils.h"
-#include "user.h"
 #include "parser.h"
 
 int user_inerface(int& row, int& column) {
@@ -40,32 +38,34 @@ int main(int argc, char** argv) {
 		return 1;
 	}*/
 
-	int size = 0;
-	int row = 0;
-	float column = 0;
-	char* name;
-	utils::User user = {1, "Joe", 15};
-    utils::parse("11", row);
-    utils::parse("1.12", column);
-    std::cout << "int:" << row << std::endl;
-    std::cout << "float:" << column << std::endl;
-    
-	utils::parse("name", name);
-    std::cout << "char:" << name << std::endl;
+    int* p_i = utils::parse<int>("11");
+    float* p_f = utils::parse<float>("3.1415");
+    char* p_name = utils::parse<char>("Jone");
+    double* p_d = utils::parse<double>("3.1415926");
+    double* p_d2 = utils::parse<double>("3.1415926");
+    utils::User* p_user = utils::parse<utils::User>("0 Jone 15 40.5");
 
-	std::cout << user << std::endl;
-	utils::parse("2 Lucy 15", user);
-	std::cout << "user: " << user << std::endl;
 
-	delete[] name;
+    std::cout << "int: " << (p_i ? std::to_string(*p_i) : "None") << std::endl;
+    std::cout << "float: " << (p_f ? std::to_string(*p_f) : "None") << std::endl;
+    std::cout << "char: " << (p_name ? p_name : "None") << std::endl;
+    std::cout << "double: " << (p_d ? std::to_string(*p_d) : "None") << std::endl;
+    std::cout << "double: " << (p_d2 ? std::to_string(*p_d2) : "None") << std::endl;
+    std::cout << "user:" << p_user << std::endl;
 
-	
+    delete p_i;
+    delete p_f;
+	delete[] p_name;
+    delete[] p_d;
+    //delete p_user;
+
+    /*
 	parser::Parser tab("int\tchar\tfloat", "\t");
 	tab.parse_line("5\tname\t3.14");
-	std::cout << *tab.get_value<int>(0,size) << std::endl;
-	std::cout << *tab.get_value<char*>(1,size) << std::endl;
-	std::cout << *tab.get_value<float>(2,size) << std::endl;
-	
+	std::cout << tab.get_value<int>(0, 0) << std::endl;
+	std::cout << tab.get_value<char>(1, 0) << std::endl;
+	std::cout << tab.get_value<float>(2, 0) << std::endl;*/
+
 	google::ShutdownGoogleLogging();
     return 0;
 }

@@ -6,71 +6,107 @@
 #include <map>
 #include <memory>
 #include <ostream>
+#include <glog/logging.h>
 
 #include "utils.h"
 #include "user.h"
 
 namespace parser {
+
 class Parser {
 public:
 	explicit Parser(std::string formats);
 	explicit Parser(std::string formats, std::string delimiter);
-	void set_format(std::string formats);
-	void parse_line(std::string line);
+	bool set_format(std::string formats);
+	bool parse_line(std::string line);
 
-	//template<typename T>
-    //void parse_word(std::string word, std::shared_ptr<void>& value_ptr, int& value_size);
+    template<typename T>
+    T* get_value(int row, int index);
 
-
-	template<typename T>
-	void parse_word(std::string word, std::shared_ptr<void>& value_ptr, int& value_size) {
-		std::vector<std::string> word_vector;
-		utils::split(word, ":", word_vector);
-		std::vector<std::string> subwords;
-
-		if (word_vector.size() < 2) {
-			value_size = 1;
-			subwords = word_vector;
-		}
-		else {
-			utils::parse(word_vector[0], value_size);
-			utils::split(word_vector[1], " ", subwords);
-		}
-		T* pv = new T[value_size];
-		if (static_cast<int>(subwords.size()) != value_size) {
-			std::cout << "[WARN]: ******!";
-		}
-		for (int i = 0; i < value_size; ++i) {
-			T v;
-			utils::parse(subwords[i], v);
-			pv[i] = v;
-		}
-		value_ptr = std::shared_ptr<void>(pv);
-
-		return;
-	}
-
-	template<typename T>
-	T* get_value(int row, int& size) {
-		size = _values_size[row];
-		T* value_ptr = static_cast<T*>(_values[row].get());
-		return value_ptr;
-	}
+    template<typename T>
+    std::vector<T*> get_value(int row);
 
 	//friend std::ostream& operator<<(std::ostream& out, const Parser parser);
 
 private:
-    std::vector<std::string> _formats;
-	std::vector<std::shared_ptr<void> > _values;
-    std::vector<int> _values_size;
+    enum Format {CHAR, INT, FLOAT, DOUBLE, USER};
+
+    template<typename T>
+    std::vector<std::unique_ptr<void> > parse_word(std::string word);
+
+    std::vector<std::vector<std::unique_ptr<void> > > _values;
 	std::string _delimiter;
 	int _columns_size;
 
-	std::map<std::string, int> _format_map;
-	void init_map();
+    std::vector<enum Format> _formats;
+    void init_format(std::string str);
 
 };
 
+template<typename T>
+T* Parser::get_value(int row, int index) {
+    if (row >= static_cast<int>(_values.size())) {
+        LOG(ERROR) << "row = " << row << " out of range!";
+        return nullptr;
+    }
+    if (index >= static_cast<int>(_values[row].size())) {
+        LOG(ERROR) << "row = " << row << "index = " << index << " out of range!";
+        return nullptr;
+    }
+
+    void* value_void = _values[row][index].get();
+    T* value = static_cast<T*>(value_void);
+
+    return value;
+}
+
+template<typename T>
+std::vector<T*> Parser::get_value(int row) {
+    std::vector<T*> array;
+    if (row >= static_cast<int>(_values.size())) {
+        LOG(ERROR) << "row = " << row << " out of range!";
+        array.emplace_back(nullptr);
+        return array;
+    }
+
+    for (int i = 0; i < static_cast<int>(_values[row].size()); ++i) {
+        T* pv = get_value<T>(row, i);
+        array.emplace_back(pv);
+    }
+
+    return array;
+}
+
+template<typename T>
+std::vector<std::unique_ptr<void> > parse_word(std::string word) {
+    std::vector<std::string> word_vector = utils::split(word, ":");
+    int array_size = 0;
+    std::vector<std::string> subwords;
+
+    if (word_vector.size() < 2) {
+        array_size = 1;
+        subwords = word_vector;
+    }
+    else {
+        int* size = utils::parse<int>(word_vector[0]);
+        array_size = *size;
+        delete size;
+        subwords = utils::split(word_vector[1], ",");
+    }
+    if (static_cast<int>(subwords.size()) != array_size) {
+        LOG(ERROR) << "Wrong size! size = " << array_size << ", words size = " << subwords.size();
+    }
+
+    std::vector<std::unique_ptr<void> > array;
+    array.clear();
+    T* value_ptr = nullptr;
+    for (int i = 0; i < static_cast<int>(subwords.size()); ++i) {
+        value_ptr = utils::parse<T>(subwords[i]);
+        array.emplace_back(std::unique_ptr<void>(value_ptr));
+    }
+
+    return array;
+}
 
 } // end of parser
 

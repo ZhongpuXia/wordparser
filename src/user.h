@@ -1,21 +1,25 @@
-#ifndef _USER_H_
-#define _USER_H_
+#ifndef _USER_UTILS_H_
+#define _USER_UTILS_H_
 
+#include <vector>
 #include <string>
 #include <memory>
-#include <iostream>
+
+#include "utils.h"
 
 namespace utils {
 
 struct User {
     int id;
-	std::string name;
-	int age;
+    std::unique_ptr<char> name;
+    int age;
+    float weight;
 
-    friend std::ostream& operator<< (std::ostream& out, const User& user);
+    friend std::ostream& operator<< (std::ostream& out, const User* user);
 };
 
-void parse(std::string str, User& user);
+template<>
+User* parse<User>(std::string str);
 
 } // end of utils
 

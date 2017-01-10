@@ -1,72 +1,78 @@
-#include <glog/logging.h>
 #include "parser.h"
 
 namespace parser {
 
-void Parser::init_map() {
-	_format_map["int"] = 0;
-	_format_map["float"] = 1;
-	_format_map["double"] = 2;
-	_format_map["char"] = 3;
-	_format_map["User"] = 4;
-}
-
 Parser::Parser(std::string formats) {
 	_delimiter = "\t";
-	utils::split(formats, _delimiter, _formats);
-	_columns_size = _formats.size();
-	init_map();
+    set_format(formats);
 }
 
 Parser::Parser(std::string formats, std::string delimiter) {
 	_delimiter = delimiter;
-	utils::split(formats, delimiter, _formats);
-	_columns_size = _formats.size();
-	init_map();
+    set_format(formats);
 }
 
-void Parser::set_format(std::string formats) {
-	utils::split(formats, _delimiter, _formats);
-	_columns_size = _formats.size();
-}
-
-void Parser::parse_line(std::string line) {
-    std::vector<std::string> words;
-	utils::split(line, _delimiter, words);
-	if (static_cast<int>(words.size()) != _columns_size) {
-		LOG(ERROR) << "Wrong size of the lines!";
-		return;
-	}
-	for (int i = 0; i < _columns_size; ++i) {
-		int value_size = 0;
-		std::shared_ptr<void> value_ptr(nullptr);
-		
-		switch (_format_map[_formats[i]]) {
-			std::cout << _format_map[_formats[i]] << std::endl;
-			case 0: 
-				parse_word<int>(words[i], value_ptr, value_size);
-				std::cout << "value:" << *((int*) value_ptr.get()) << "value_size:" << value_size;
-				break;
-			case 1: 
-                parse_word<float>(words[i], value_ptr, value_size);
-				break;
-			case 2: 
-                parse_word<double>(words[i], value_ptr, value_size);
-				break;
-			case 3: 
-                parse_word<char*>(words[i], value_ptr, value_size);
-                break;
-			case 4: 
-				parse_word<utils::User>(words[i], value_ptr, value_size);
-				break;
-			default: 
-				LOG(WARNING) << "undefined type: [" << _formats[i] <<"]";
+bool Parser::set_format(std::string formats) {
+    std::vector<std::string> fmts = utils::split(formats, _delimiter);
+	_columns_size = static_cast<int>(_formats.size());
+    _formats.resize(_columns_size);
+    for (int i = 0; i < _columns_size; ++i) {
+        if (fmts[i].compare("char") == 0) {
+            _formats[i] = CHAR;
         }
+        else if (fmts[i].compare("int") == 0 ) {
+            _formats[i] = INT;
+        }
+        else if (fmts[i].compare("float") == 0 ) {
+            _formats[i] = FLOAT;
+        }
+        else if (fmts[i].compare("double") == 0) {
+            _formats[i] = DOUBLE;
+        }
+        else if (fmts[i].compare("User") == 0) {
+            _formats[i] = USER;
+        }
+        else {
+            LOG(ERROR) << "Wrong type: " << fmts[i];
+            return false;
+        }
+    }
+    return true;
+}
 
-		LOG(INFO) << "The " << i << "-th row is: " << _formats[i] << ", size = " << value_size;
-		_values.emplace_back(value_ptr);
-        _values_size.push_back(value_size);
+bool Parser::parse_line(std::string line) {
+    std::vector<std::string> words = utils::split(line, _delimiter);
+	if (static_cast<int>(words.size()) > _columns_size) {
+		LOG(ERROR) << "Wrong size of the lines!";
+		return false;
 	}
+	for (int i = 0; i < static_cast<int>(words.size()); ++i) {
+        enum Format fmt = _formats[i];
+        std::vector<std::unique_ptr<void> > values_ptr;
+		switch (fmt) {
+            case CHAR:
+                values_ptr = parse_word<char>(words[i]);
+                break;
+			case INT:
+                values_ptr = parse_word<int>(words[i]);
+                break;
+			case FLOAT:
+                values_ptr = parse_word<float>(words[i]);
+                break;
+			case DOUBLE:
+                values_ptr = parse_word<double>(words[i]);
+                break;
+			case USER:
+                values_ptr = parse_word<utils::User>(words[i]);
+                break;
+			default:
+				LOG(ERROR) << "undefined type: [" << fmt <<"]";
+                return false;
+        }
+		LOG(INFO) << "The " << i << "-th row is: " << _formats[i];
+		_values.emplace_back(std::move(values_ptr));
+	}
+    return true;
 }
 
 /*std::ostream& operator<< (std::ostream out, const Parser parser) {
@@ -99,4 +105,4 @@ void Parser::parse_line(std::string line) {
 }*/
 
 
-} //end of parser 
+} //end of parser

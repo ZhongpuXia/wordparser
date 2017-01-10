@@ -1,85 +1,81 @@
-#include <string>
-#include <iostream>
-#include <glog/logging.h>
-
 #include "utils.h"
 
 namespace utils {
 
-void parse(std::string str, int& value) {
+template<>
+int* parse<int>(std::string str) {
     std::size_t len = str.length();
     if (0 == len) {
-		LOG(WARNING) << "The string is empty, value = 0!";
-		value = 0;
-        return;
+		LOG(WARNING) << "The string is empty, return nullptr!";
+        return nullptr;
     }
-
     std::string::size_type sz;
-    value = std::stoi(str, &sz, 10);
-    if (sz == 0) {
-		LOG(WARNING) << "No digit is included, value = 0!";
-		value = 0;
-	}
-	else if (sz < len) {
-		LOG(WARNING) << "Characters are included in the string!";
+    int* p_value = new int;
+    *p_value = std::stoi(str, &sz, 10);
+    if (0 == sz) {
+		LOG(WARNING) << "No digit is included, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
+    }
+    if (sz < len) {
+		LOG(WARNING) << "Characters are included in digits, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
     }
 
-    return;
+    return p_value;
 }
 
-void parse(std::string str, float& value) {
+template<>
+float* parse<float>(std::string str) {
     std::size_t len = str.length();
     if (0 == len) {
-		LOG(WARNING) << "The string is empty, value = 0!";
-		value = 0.0;
-        return;
+		LOG(WARNING) << "The string is empty, return nullptr!";
+        return nullptr;
     }
-
     std::string::size_type sz;
-    value = std::stof(str, &sz);
-    if (sz == 0) {
-		LOG(WARNING) << "No digit is included, value = 0!";
-		value = 0.0;
-	}
-    else if (sz < len) {
-		LOG(WARNING) << "Characters are included in the string!";
+    float* p_value = new float;
+    *p_value = std::stof(str, &sz);
+    if (0 == sz) {
+		LOG(WARNING) << "No digit is included, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
+    }
+    if (sz < len) {
+		LOG(WARNING) << "Characters are included in digits, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
     }
 
-    return;
+    return p_value;
 }
 
-void parse(std::string str, double& value) {
+template<>
+double* parse<double>(std::string str) {
     std::size_t len = str.length();
     if (0 == len) {
-		LOG(WARNING) << "The string is empty, value = 0!";
-		value = 0.0;
-        return;
+		LOG(WARNING) << "The string is empty, return nullptr!";
+        return nullptr;
     }
-
     std::string::size_type sz;
-    value = std::stod(str, &sz);
-    if (sz == 0) {
-		LOG(WARNING) << "No digit is included, value = 0!";
-		value = 0.0;
-	}
-    else if (sz < len) {
-		LOG(WARNING) << "Characters are included in the string!";
+    double* p_value = new double;
+    *p_value = std::stod(str, &sz);
+    if (0 == sz) {
+		LOG(WARNING) << "No digit is included, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
+    }
+    if (sz < len) {
+		LOG(WARNING) << "Characters are included in digits, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
     }
 
-    return;
+    return p_value;
 }
 
-void parse(std::string str, char*& value) {
-	std::size_t len = str.length();
-
-	value = new char[len + 1];
-	std::copy(str.begin(), str.end(), value);
-	value[len] = '\0';
-
-    return;
-}
-
-void split(std::string str, std::string delimiter, std::vector<std::string>& sub_strs) {
+std::vector<std::string> split(std::string str, std::string delimiter) {
+    std::vector<std::string> sub_strs;
 	std::size_t pos = 0;
 	std::size_t found = 0;
 	sub_strs.clear();
@@ -94,7 +90,7 @@ void split(std::string str, std::string delimiter, std::vector<std::string>& sub
 		pos = found + 1;
 	}
 
-	return;
+	return sub_strs;
 }
 
 } // end of utils

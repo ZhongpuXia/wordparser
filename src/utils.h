@@ -1,21 +1,41 @@
 
-#ifndef _UTILS_H__
-#define _UTILS_H__
+#ifndef _UTILS_BUILDIN_H__
+#define _UTILS_BUILDIN_H__
 
 #include <string>
 #include <vector>
+#include <typeinfo>
+#include <glog/logging.h>
 
 namespace utils {
 
-void parse(std::string str, int& value);
+template<typename T>
+T* parse(std::string str) {
+    std::size_t len = str.length();
+    if (0 == len) {
+		LOG(WARNING) << "The string is empty, return nullptr!";
+        return nullptr;
+    }
+    if (typeid(char) != typeid(T)) {
+        LOG(WARNING) << "Unknown type, convert to char*!";
+    }
+    T* p_value = new char[len + 1];
+    std::copy(str.begin(), str.end(), p_value);
+    p_value[len] = '\0';
 
-void parse(std::string str, float& value);
+    return p_value;
+}
 
-void parse(std::string str, double& value);
+template<>
+int* parse<int>(std::string str);
 
-void parse(std::string str, char*& value);
+template<>
+float* parse<float>(std::string str);
 
-void split(std::string str, std::string delimiter, std::vector<std::string>& sub_strs);
+template<>
+double* parse<double>(std::string str);
+
+std::vector<std::string> split(std::string str, std::string delimiter);
 
 } // end of utils
 #endif
