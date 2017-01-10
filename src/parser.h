@@ -15,8 +15,8 @@ namespace parser {
 
 class Parser {
 public:
-	explicit Parser(std::string formats);
-	explicit Parser(std::string formats, std::string delimiter);
+    explicit Parser();
+	explicit Parser(std::string delimiter);
 	bool set_format(std::string formats);
 	bool parse_line(std::string line);
 
@@ -32,7 +32,7 @@ private:
     enum Format {CHAR, INT, FLOAT, DOUBLE, USER};
 
     template<typename T>
-    std::vector<std::unique_ptr<void> > parse_word(std::string word);
+    void parse_word(std::string word, int row);
 
     std::vector<std::vector<std::unique_ptr<void> > > _values;
 	std::string _delimiter;
@@ -78,7 +78,7 @@ std::vector<T*> Parser::get_value(int row) {
 }
 
 template<typename T>
-std::vector<std::unique_ptr<void> > parse_word(std::string word) {
+void Parser::parse_word(std::string word, int row) {
     std::vector<std::string> word_vector = utils::split(word, ":");
     int array_size = 0;
     std::vector<std::string> subwords;
@@ -97,15 +97,13 @@ std::vector<std::unique_ptr<void> > parse_word(std::string word) {
         LOG(ERROR) << "Wrong size! size = " << array_size << ", words size = " << subwords.size();
     }
 
-    std::vector<std::unique_ptr<void> > array;
-    array.clear();
     T* value_ptr = nullptr;
     for (int i = 0; i < static_cast<int>(subwords.size()); ++i) {
         value_ptr = utils::parse<T>(subwords[i]);
-        array.emplace_back(std::unique_ptr<void>(value_ptr));
+        _values[row].emplace_back(std::unique_ptr<void>(value_ptr));
     }
 
-    return array;
+    return;
 }
 
 } // end of parser
