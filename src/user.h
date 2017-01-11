@@ -15,7 +15,7 @@ struct User {
     int age;
     float weight;
 
-    friend std::ostream& operator<< (std::ostream& out, const User* user);
+    friend std::ostream& operator<< (std::ostream& out, const User& user);
 };
 
 template<>

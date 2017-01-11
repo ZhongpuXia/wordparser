@@ -5,20 +5,29 @@
 
 #include "parser.h"
 
-int user_inerface(int& row, int& column) {
-	std::cout << "Please enter the row:" << std::endl;
-	std::cin >> row;
-	std::cout << "Please enter the column:" << std::endl;
-	std::cin >> column;
+int user_interface(int column_limit) {
+    int column = 0;
+    while (1) {
+    	std::cout << "\n\ncolumn[0 ~ " << column_limit << "], ";
+        std::cout << "-1: next row; -2: quit" << std::endl;
+        std::cout << "Please input value: ";
+	    std::cin >> column;
+        if (column < column_limit && column > -3) {
+            break;
+        }
+        std::cout << "Value is out of the range, Please input again!";
+    }
 
-	if(row == -1 && column == -1) {
+	if (column == -2) {
 		std::cout << "QUIT is selected!" << std::endl;
-		return 0;
 	}
-	std::cout << "row [" << row <<", "<< column <<"] is selected to display!";
-	std::cout << std::endl;
-	//TODO: error input, output complete row or colum.
-	return 1;
+    else if (column == -1) {
+		std::cout << "Next row is selected!" << std::endl;
+    }
+    else {
+        std::cout << column << "-th is selected to display!" << std::endl;
+    }
+	return column;
 }
 
 
@@ -27,16 +36,56 @@ int main(int argc, char** argv) {
 	FLAGS_colorlogtostderr = true;  // Set log color
 	FLAGS_logtostderr = true;
 
-	//google::SetLogDestination(google::GLOG_INFO, "./log");
-	LOG(INFO) << "initialize the file";
-	LOG(WARNING) << "warn";
-/*	std::ifstream in_file;
-	std::string file_name = "./test.txt";
+    if (argc < 2) {
+        LOG(ERROR) << "No file is input, exit(1)!";
+        LOG(INFO) << "Run as: " << argv[0] << " file path";
+        return 1;
+    }
+
+	std::ifstream in_file;
+	std::string file_name(argv[1]);
 	in_file.open(file_name, std::ios::in);
-	if(!in_file.good()) {
-		std::cerr << "Failed to open file: " << file_name << std::endl;
-		return 1;
-	}*/
+	if (!in_file.is_open()) {
+		LOG(ERROR) << "Failed to open: " << file_name << ", exit(1)!" << std::endl;
+	}
+
+    parser::Parser parser("\t");
+    char str_in[256];
+    in_file.getline(str_in, 255, '\n');
+    std::string head(str_in);
+    if (!parser.set_format(head)) {
+        LOG(ERROR) << "Title of file: " << str_in << "exit(1)!" << std::endl;
+        return 1;
+    }
+
+    while (1) {
+        in_file.getline(str_in, 255, '\n');
+        if (!in_file.good()) {
+            std::cout << "End of the file!" << std::endl;
+            break;
+        }
+
+        std::string contents(str_in);
+        parser.parse_row(contents);
+        int column_size = parser.columns_size();
+
+        int col_select = 0;
+        while(1) {
+            col_select = user_interface(column_size - 1);
+            if (col_select > -1) {
+              parser.print_column(col_select);
+            }
+            else {
+                break;
+            }
+        }
+        if (col_select == -2) {
+            break;
+        }
+    }
+    in_file.close();
+
+
 
     int* p_i = utils::parse<int>("11");
     float* p_f = utils::parse<float>("3.1415");
@@ -61,10 +110,13 @@ int main(int argc, char** argv) {
 
 	parser::Parser ps("\t");
     ps.set_format("int\tchar\tfloat");
-	ps.parse_line("5\tname\t3.14");
-	std::cout << *ps.get_value<int>(0, 0) << std::endl;
-	std::cout << ps.get_value<char>(1, 0) << std::endl;
-	std::cout << *ps.get_value<float>(2, 0) << std::endl;
+	ps.parse_row("5\tname\t3.14");
+	std::cout << *ps.get_column<int>(0)[0] << std::endl;
+	std::cout << ps.get_column<char>(1)[0] << std::endl;
+	std::cout << *ps.get_column<float>(2)[0] << std::endl;
+    ps.print_column(0);
+    ps.print_column(1);
+    ps.print_column(2);
 
 	google::ShutdownGoogleLogging();
     return 0;

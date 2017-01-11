@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "utils.h"
 
 namespace utils {
@@ -11,9 +12,16 @@ int* parse<int>(std::string str) {
     }
     std::string::size_type sz;
     int* p_value = new int;
-    *p_value = std::stoi(str, &sz, 10);
-    if (0 == sz) {
+    try {
+        *p_value = std::stoi(str, &sz, 10);
+    }
+    catch (std::invalid_argument& e) {
 		LOG(WARNING) << "No digit is included, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
+    }
+    catch (std::out_of_range& e) {
+		LOG(WARNING) << "Value fall out of the range, return nullptr!";
         delete p_value;
         p_value = nullptr;
     }
@@ -35,9 +43,16 @@ float* parse<float>(std::string str) {
     }
     std::string::size_type sz;
     float* p_value = new float;
-    *p_value = std::stof(str, &sz);
-    if (0 == sz) {
+    try {
+        *p_value = std::stof(str, &sz);
+    }
+    catch (std::invalid_argument& e) {
 		LOG(WARNING) << "No digit is included, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
+    }
+    catch (std::out_of_range& e) {
+		LOG(WARNING) << "Value fall out of the range, return nullptr!";
         delete p_value;
         p_value = nullptr;
     }
@@ -59,9 +74,16 @@ double* parse<double>(std::string str) {
     }
     std::string::size_type sz;
     double* p_value = new double;
-    *p_value = std::stod(str, &sz);
-    if (0 == sz) {
+    try {
+        *p_value = std::stod(str, &sz);
+    }
+    catch (std::invalid_argument& e) {
 		LOG(WARNING) << "No digit is included, return nullptr!";
+        delete p_value;
+        p_value = nullptr;
+    }
+    catch (std::out_of_range& e) {
+		LOG(WARNING) << "Value fall out of the range, return nullptr!";
         delete p_value;
         p_value = nullptr;
     }

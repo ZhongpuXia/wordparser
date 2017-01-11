@@ -1,0 +1,2 @@
+User	int	float	double	char
+0 Joe 17 48	20	3.14	7.73254	China

@@ -4,16 +4,12 @@
 
 namespace utils {
 
-std::ostream& operator<< (std::ostream& out, const User* user) {
-    if (user) {
-        out << " id=" << user->id;
-        out << ", name=" << (user->name).get();
-        out << ", age=" << user->age;
-        out << ", weight=" << user->weight;
-    }
-    else {
-        out << "None";
-    }
+std::ostream& operator<< (std::ostream& out, const User& user) {
+    out << " id=" << user.id;
+    out << ", name=" << (user.name).get();
+    out << ", age=" << user.age;
+    out << ", weight=" << user.weight;
+
     return out;
 }
 

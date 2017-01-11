@@ -11,13 +11,14 @@ namespace utils {
 
 template<typename T>
 T* parse(std::string str) {
+    if (typeid(char) != typeid(T)) {
+        LOG(WARNING) << "Unknown type, convert to char*!";
+    }
+
     std::size_t len = str.length();
     if (0 == len) {
 		LOG(WARNING) << "The string is empty, return nullptr!";
         return nullptr;
-    }
-    if (typeid(char) != typeid(T)) {
-        LOG(WARNING) << "Unknown type, convert to char*!";
     }
     T* p_value = new char[len + 1];
     std::copy(str.begin(), str.end(), p_value);
